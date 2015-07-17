@@ -20,22 +20,29 @@ scanner.appList(app_path, function(apps) {
 
       var path_app = '/' + info.name;
       var type = info.type;
+      var module_path = './' + path.join(app_directory, info.name + '/');
 
       switch(info.type) {
 
         case 'node':
-          var module_path = './' + path.join(app_directory, info.name + '/');
-
           if(info.platform.express) { module_path += 'app'; type = 'express'; }
 
           try {
-            var module = require('./' + module_path);
+            var module = require(module_path);
           } catch(e) {
             module_path += info.app.main;
-            var module = require('./' + module_path);
+            var module = require(module_path);
           }
 
           // Load into routes
+          app.use(path_app, module);
+          break;
+
+        case 'router':
+          module_path += 'index.router.js';
+          var module = require(module_path);
+
+          // Load route
           app.use(path_app, module);
           break;
 
